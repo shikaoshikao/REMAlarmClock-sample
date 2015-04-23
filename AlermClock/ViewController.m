@@ -29,16 +29,14 @@
     
     // DatePickerの設定
     UIDatePicker* datePicker = [[UIDatePicker alloc]init];
-    [datePicker setDatePickerMode:UIDatePickerModeDate];
+    // 日付の表示モードを変更する(時分を表示)
+    datePicker.datePickerMode = UIDatePickerModeDateAndTime;
+    // 分の刻みを10分おきにする
+    datePicker.minuteInterval = 10;
     
     //24時間表示のために
     NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:@"ja_JP"];
     datePicker.locale = locale;
-    
-    // 日付の表示モードを変更する(時分を表示)
-    datePicker.datePickerMode = UIDatePickerModeTime;
-    // 分の刻みを10分おきにする
-    datePicker.minuteInterval = 10;
     
     // DatePickerを編集したら、updateTextFieldを呼び出す
     [datePicker addTarget:self action:@selector(updateTextField:) forControlEvents:UIControlEventValueChanged];
@@ -71,6 +69,9 @@
     
     [time1TextFieid addTarget:self action:@selector(text1Edited) forControlEvents:UIControlEventEditingDidBegin];
     [time2TextFieid addTarget:self action:@selector(text2Edited) forControlEvents:UIControlEventEditingDidBegin];
+    
+    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+    //NSLog(@"now:%@",now);
 
     
 }
@@ -89,13 +90,13 @@
     UIDatePicker *picker = (UIDatePicker *)sender;
     if (activeField == time1TextFieid){
         time1TextFieid.text = [df stringFromDate:picker.date];
-        minTime = picker.date;
+        minTime = [NSDate dateWithTimeInterval: [[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:picker.date];
         NSLog(@"min:%@",minTime);
     }
     if (activeField == time2TextFieid) {
         time2TextFieid.text = [df stringFromDate:picker.date];
-        maxTime = picker.date;
-        NSLog(@"max:%@",maxTime);
+        maxTime = [NSDate dateWithTimeInterval: [[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:picker.date];
+        //NSLog(@"max:%@",maxTime);
     }
 }
 
@@ -116,59 +117,39 @@
 -(void)checkAlerm{
 }
 
+-(IBAction)start{
+    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+    [self checkLem];
+    NSLog(@"%@",now);
+}
+
+-(IBAction)startAfter30{
+    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+    now = [now initWithTimeInterval:30*60 sinceDate:now];
+    [self checkLem];
+    NSLog(@"%@",now);
+}
+
 
 -(void)checkLem{
-//    NSDate *now = [NSDate new];
-//    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-//    NSUInteger flags = NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute;
-//    NSDateComponents *components = [gregorian components:flags fromDate:now];
-//    int minutes = (int)components.minute;
-//    int hour = (int)components.hour;
-//    int day = (int)components.day;
-    now = [NSDate new];
-
     
-    
-    //    NSComparisonResult result = [date compare:];
-    //    switch(result) {
-    //        case NSOrderedSame: // 一致したとき
-    //            NSLog(@"同じ日付です");
-    //            break;
-    //
-    //        case NSOrderedAscending: // date1が小さいとき
-    //            NSLog(@"異なる日付です（date1のが小）");
-    //            break;
-    //
-    //        case NSOrderedDescending: // date1が大きいとき
-    //            NSLog(@"異なる日付です（date1のが大）");
-    //            break;
-    //
-}
--(void)checkLem2{
-    NSDate *now = [NSDate date] ;
-    NSString *date_converted;
-    NSDate* date_source =[NSDate date];
-    NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"H:m"];
-    date_converted = [formatter stringFromDate:date_source];
-    if (date_converted<time2TextFieid) {
-        f=2;
+    int i = 0;
+    int j = 0;
+    NSComparisonResult maxNowResult = NSOrderedAscending;
+    while (maxNowResult == NSOrderedAscending){
+        checkTime = [now initWithTimeInterval:i*5400 sinceDate:now];
+        maxNowResult = [checkTime compare:maxTime];
+        NSComparisonResult minNowResult = [checkTime compare:minTime];
+        if(minNowResult == NSOrderedDescending){
+            alarmTime[j] = checkTime;
+            j++;
+        }
+        i++;
     }
-    //    NSComparisonResult result = [date_converted compare:date_converted];
-    //        switch(result) {
-    //        case NSOrderedSame: // 一致したとき
-    //            NSLog(@"同じ日付です");
-    //            break;
-    //
-    //        case NSOrderedAscending: // date1が小さいとき
-    //            NSLog(@"異なる日付です（date1のが小）");
-    //            break;
-    //
-    //        case NSOrderedDescending: // date1が大きいとき
-    //            NSLog(@"異なる日付です（date1のが大）");
-    //            break;
-    //    }
+    
 }
+
+
 -(void)ringAlerm{
     if(f==1){
         NSString * path = [[NSBundle mainBundle]pathForResource:@"wind_sound"ofType:@"wav"];

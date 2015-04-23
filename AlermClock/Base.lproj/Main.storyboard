@@ -105,6 +105,9 @@
                                 <state key="normal" title="30分後に寝る">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="startAfter30" destination="vXZ-lx-hvc" eventType="touchUpInside" id="eRM-XA-MGd"/>
+                                </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rYP-LK-QJ5">
                                 <rect key="frame" x="81" y="430" width="97" height="30"/>

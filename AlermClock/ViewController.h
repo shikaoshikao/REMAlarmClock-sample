@@ -26,7 +26,8 @@
     AVAudioPlayer *audio ;
     NSTimer * timer2;
     int f;
-    NSDate*now;
+    NSDate * checkTime;
+    NSDate * now;
 //    NSDate*date;
 //    NSString*date2;
 //    NSString*date3;
@@ -34,10 +35,12 @@
     NSDate *maxTime;
     UITextField *activeField;
     NSDateFormatter *df;
+    NSDate *alarmTime[10];
 }
 @property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
 
--(IBAction)start:(id)sender;
+-(IBAction)start;
+-(IBAction)startAfter30;
 -(void)checkLem;
 -(void)checkLem2;
 -(void)ringAlerm;
