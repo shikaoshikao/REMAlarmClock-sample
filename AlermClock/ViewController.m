@@ -18,9 +18,6 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    f=0;
-    minutesEndLabel.text=[NSString stringWithFormat:@"%d",number/60];
-    secondEndLabel.text=[NSString stringWithFormat:@"%d",number%60];
     
     //dateFormatterの設定
     df = [[NSDateFormatter alloc] init];
@@ -70,12 +67,13 @@
     [time1TextFieid addTarget:self action:@selector(text1Edited) forControlEvents:UIControlEventEditingDidBegin];
     [time2TextFieid addTarget:self action:@selector(text2Edited) forControlEvents:UIControlEventEditingDidBegin];
     
-    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
-    //NSLog(@"now:%@",now);
-
+    [self NowTime];
+    [self showNowTime:(NSTimer *)nowTimeTimer];
+    nowTimeTimer =[NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(showNowTime:) userInfo:nil repeats:YES];
     
 }
 
+//どっちのtetFieldに時間を入力するのかを判別するためのメソッド
 - (void)text1Edited {
     activeField = time1TextFieid;
 }
@@ -84,8 +82,7 @@
 }
 
 
-
-#pragma mark DatePickerの編集が完了したら結果をTextFieldに表示
+//DatePickerの編集が完了したら結果をTextFieldに表示
 -(void)updateTextField:(id)sender {
     UIDatePicker *picker = (UIDatePicker *)sender;
     if (activeField == time1TextFieid){
@@ -100,7 +97,7 @@
     }
 }
 
-#pragma mark datepickerの完了ボタンが押された場合
+//datepickerの完了ボタンが押された場合
 -(void)pickerDoneClicked {
     [time1TextFieid resignFirstResponder];
     [time2TextFieid resignFirstResponder];
@@ -108,29 +105,20 @@
 }
 
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
--(void)checkAlerm{
-}
-
+//「今すぐ寝る」を押した時
 -(IBAction)start{
-    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
-    [self checkLem];
+    [self NowTime];//-(void)NowTimeを呼び出す(下の方にあるよ)
+    [self checkLem];//-(void)checkLemを呼び出す
     NSLog(@"%@",now);
 }
 
 -(IBAction)startAfter30{
-    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
-    now = [now initWithTimeInterval:30*60 sinceDate:now];
-    [self checkLem];
+    [self after30minTime];//-(void)after30minTimeを呼び出す(下の方にあるよ)
+    [self checkLem];//-(void)checkLemを呼び出す
     NSLog(@"%@",now);
 }
 
-
+//アラームを鳴らす時刻を決める
 -(void)checkLem{
     int i = 0;
     int j = 0;
@@ -149,11 +137,12 @@
         i++;
     }
     
-    timer =[NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(countDown:) userInfo:nil repeats:YES];
+    leftTimeTimer =[NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(countDown:) userInfo:nil repeats:YES];
 }
 
--(void)countDown:(NSTimer *)timer{
-    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+//残り時間を減らしていくよ！
+-(void)countDown:(NSTimer *)leftTimeTimer{
+    [self NowTime];
     NSTimeInterval delta = [alarmTime[0] timeIntervalSinceDate:now];
     NSLog(@"%d",(int)delta);
     int hour = (int)delta/3600;
@@ -162,7 +151,30 @@
     hourEndLabel.text=[NSString stringWithFormat:@"%d",hour];
     minutesEndLabel.text=[NSString stringWithFormat:@"%d",minute];
     secondEndLabel.text=[NSString stringWithFormat:@"%d",second];
+}
+
+-(void)showNowTime:(NSTimer *)nowTimeTimer{
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSUInteger flags;
+    NSDateComponents *comps;
+    // 時・分を取得
+    flags = NSHourCalendarUnit | NSMinuteCalendarUnit;
+    comps = [calendar components:flags fromDate:now];
     
+    hourLabel.text = [NSString stringWithFormat:@"%d",(int)comps.hour];
+    minutesLabel.text = [NSString stringWithFormat:@"%d",(int)comps.minute];
+
+}
+
+
+//現在時刻を取得
+-(void)NowTime{
+    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+}
+//30分後の時刻を取得
+-(void)after30minTime{
+    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+    now = [now initWithTimeInterval:30*60 sinceDate:now];
 }
 
 
@@ -177,6 +189,9 @@
 
 
 
-
-
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 @end

@@ -22,9 +22,9 @@
     IBOutlet UITextField * time2TextFieid;
     IBOutlet UITextField * time2TextFieid2;
     int number;
-    NSTimer * timer;
+    NSTimer * leftTimeTimer;
     AVAudioPlayer *audio ;
-    NSTimer * timer2;
+    NSTimer * nowTimeTimer;
     int f;
     NSDate * checkTime;
     NSDate * now;
