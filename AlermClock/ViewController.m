@@ -132,7 +132,6 @@
 
 
 -(void)checkLem{
-    
     int i = 0;
     int j = 0;
     NSComparisonResult maxNowResult = NSOrderedAscending;
@@ -143,9 +142,26 @@
         if(minNowResult == NSOrderedDescending){
             alarmTime[j] = checkTime;
             j++;
+            if(j >10){
+                break;
+            }
         }
         i++;
     }
+    
+    timer =[NSTimer scheduledTimerWithTimeInterval:1.0f target:self selector:@selector(countDown:) userInfo:nil repeats:YES];
+}
+
+-(void)countDown:(NSTimer *)timer{
+    now = [NSDate dateWithTimeIntervalSinceNow:[[NSTimeZone systemTimeZone] secondsFromGMT]];
+    NSTimeInterval delta = [alarmTime[0] timeIntervalSinceDate:now];
+    NSLog(@"%d",(int)delta);
+    int hour = (int)delta/3600;
+    int minute = (int)delta/60 - hour*60;
+    int second = (int)delta - minute*60 - hour*3600;
+    hourEndLabel.text=[NSString stringWithFormat:@"%d",hour];
+    minutesEndLabel.text=[NSString stringWithFormat:@"%d",minute];
+    secondEndLabel.text=[NSString stringWithFormat:@"%d",second];
     
 }
 
