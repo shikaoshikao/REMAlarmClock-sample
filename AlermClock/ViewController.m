@@ -68,8 +68,8 @@
     [time2TextFieid addTarget:self action:@selector(text2Edited) forControlEvents:UIControlEventEditingDidBegin];
     
     [self NowTime];
-    [self showNowTime:(NSTimer *)nowTimeTimer];
-    nowTimeTimer =[NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(showNowTime:) userInfo:nil repeats:YES];
+    [self showNowTime:(NSTimer *)nowTimeTimer];     //最初に1回現在時刻表示するメソッドを呼ぶ
+    nowTimeTimer =[NSTimer scheduledTimerWithTimeInterval:60.0f target:self selector:@selector(showNowTime:) userInfo:nil repeats:YES];     //2回目以降は60秒おきに呼ぶ
     
 }
 
@@ -154,6 +154,7 @@
 }
 
 -(void)showNowTime:(NSTimer *)nowTimeTimer{
+    now = [NSDate new];
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSUInteger flags;
     NSDateComponents *comps;
